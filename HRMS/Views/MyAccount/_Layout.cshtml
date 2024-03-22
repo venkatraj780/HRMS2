@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid body-content">
+
+    <div>
+        <div class="row">
+            <div class="col-md-2">
+                @await Html.PartialAsync("~/Views/MyAccount/_ManageNavMyAccount.cshtml")
+            </div>
+            <div class="col-md-10">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</div>
+
+@RenderSection("Scripts", required: false)

@@ -1,0 +1,98 @@
+﻿@model HRMS.DTO.CommentCreateDTO
+@{
+    Layout = null;
+}
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<form asp-action="Create" asp-controller="Comments" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="TaskId" />
+    <div class="row">
+        <div class="col-12">
+            <label class="col-form-label">Enter Comment Description</label>
+            @* <input asp-for="Description" class="form-control" /> *@
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <label class="col-form-label">Select File</label>
+            <input asp-for="Attachements" class="form-control" />
+            <span asp-validation-for="Attachements" class="text-danger"></span>
+        </div>
+    </div>
+
+    <br/>
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <button type="submit" class="btn btn-success">Save Comment</button>
+        </div>
+        <div class="col-4"></div>
+    </div>
+</form>
+@if (ViewBag.IsSaved)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.close();
+        });
+        window.onunload = function () {
+            var win = window.opener;
+            if (!win.closed) {
+                win.afterCommentAdded(true);
+            }
+        };
+    </script>
+}
+@*<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+ <script>
+    var isAssigned = false;
+    function selectEmployee() {
+        if ($("#employee").selectedIndex < 0) {
+            alert('Please select employee.');
+            return false;
+        }
+        var empIdReplaced = $("#employee option:selected").val().trim()
+        $.ajax({
+            url: '../Leaves/AssignEmployeeToSickLeave',
+            type: "GET",
+            data: { 'leaveId': @Model.LeaveId, 'empId': @Model.EmpId, 'empIdReplaced': empIdReplaced },
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                // alert(res);
+                if (res != null) {
+                    isAssigned = res;
+                    window.close();
+                }
+                else {
+                    isAssigned = false;
+                    window.close();
+                }
+            },
+
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('error');
+            },
+            complete: function () {
+
+            }
+        });
+
+    }
+    window.onunload = function () {
+        var win = window.opener;
+        if (!win.closed) {
+            if (isAssigned) {
+                win.afterEmployeeAssign(true);
+            }
+            else {
+                win.afterEmployeeAssign(false);
+            }
+        }
+    };
+</script> *@

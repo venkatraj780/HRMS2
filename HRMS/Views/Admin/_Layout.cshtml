@@ -1,0 +1,21 @@
+﻿@* @using HRMS.Views.Shared.MainNav *@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    // ViewData.AddActivePageMainAdmin(ManageNavPagesAdmin.AdminDashboard);
+}
+
+<div class="container-fluid body-content">
+
+    <div>
+        <div class="row">
+            <div class="col-md-2">
+                @await Html.PartialAsync("~/Views/Admin/_ManageNav.cshtml")
+            </div>
+            <div class="col-md-10">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</div>
+
+@RenderSection("Scripts", required: false)

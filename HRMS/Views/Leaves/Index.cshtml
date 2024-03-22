@@ -1,0 +1,164 @@
+﻿@using HRMS.Views.Admin
+@model IEnumerable<HRMS.Models.Leave>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesAdmin.Leaves);
+}
+
+@* <p>
+    <a asp-action="Create">Create New</a>
+</p> *@
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Employee Name
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                Leave Type
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reason)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                Responded By
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmployeeApplied.FirstName) @Html.DisplayFor(modelItem => item.EmployeeApplied.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                @if (item.LeaveType == 0)
+                {
+                    <td>
+                        <Span>Sick</Span>
+                        @if (item.Status == 1)
+                        {
+                            <br />
+                            @if (item.SickLeaveReplacedEmployee == null)
+                            {
+                                <button type="button" class="btn btn-info" style="margin-bottom:5px;" onclick="assignEmployee(@item.LeaveId,@item.EmpId)">Assign Employee</button>
+                            }
+                            else
+                            {
+                                <span style="font-size:10px;color:green;">Assignd To</span>
+                                <br />
+                                <span>(</span>
+                                @Html.DisplayFor(modelItem => item.SickLeaveReplacedEmployee.EmployeeReplaced.FirstName) @Html.DisplayFor(modelItem => item.SickLeaveReplacedEmployee.EmployeeReplaced.LastName)
+                                <span>)</span>
+                            }
+                        }
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <Span>Casual</Span>
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reason)
+                </td>
+                @if (item.Status == 0)
+                {
+                    <td>
+                        <a asp-action="Approve" asp-route-id="@item.LeaveId">Approve</a> |
+                        <a asp-action="Reject" asp-route-id="@item.LeaveId">Reject</a>
+                    </td>
+                }
+                else if (item.Status == 1)
+                {
+                    <td>
+                        <Span style="color:green;">Approved</Span>
+                    </td>
+                }
+                else if (item.Status == 2)
+                {
+                    <td>
+                        <Span style="color:red;">Rejected</Span>
+                    </td>
+                }
+                <td>
+                    @item?.EmployeeApproved?.FirstName @item?.EmployeeApproved?.LastName
+
+                </td>
+                @* <td>
+            @Html.DisplayFor(modelItem => item.Status)
+            </td> *@
+
+                @* <td>
+            @Html.DisplayFor(modelItem => item.ApprovedBy)
+            </td> *@
+                @*  <td>
+            <a asp-action="Edit" asp-route-id="@item.LeaveId">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.LeaveId">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.LeaveId">Delete</a>
+            </td> *@
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    // function assignEmployee(leaveid, empid) {
+    //     alert('Assign another employee');
+    // }
+    function assignEmployee(leaveid, empid) {
+        disablediv();
+        PopupCenterCommon('@Html.Raw(Url.Action("AssignEmployee", "Leaves", new { leaveId = "LEAVEID", empId = "EMPID" }))'.replace("LEAVEID", parseInt(leaveid)).replace("EMPID", parseInt(empid)), '', 600, 260);
+
+    }
+    function PopupCenterCommon(url, title, w, h) {
+        // Fixes dual-screen position                         Most browsers      Firefox
+        var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+        var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+
+        width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+        height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+        var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+        var top = ((height / 2) - (h / 2)) + dualScreenTop;
+        var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+        if (window.focus) {
+            newWindow.focus();
+        }
+
+    }
+
+    function disablediv() {
+        $("#divMain").find("*").prop('disabled', true);
+    }
+    function enablediv() {
+        $("#divMain").find("*").prop('disabled', false);
+    }
+    function afterEmployeeAssign(isAssigned) {
+        if (isAssigned) {
+            //refresh page
+            // alert('Assigned');
+            location.reload();
+        }
+        enablediv();
+    }
+</script>

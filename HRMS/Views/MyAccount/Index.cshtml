@@ -1,0 +1,90 @@
+﻿@using HRMS.Views.MyAccount
+@model Employee
+@{
+    Layout = "/Views/MyAccount/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesMyAccount.MyAccountHome);
+}
+@if (@Model != null)
+{
+    <h4 style="float:right;">Welcome @Model.FirstName @Model.LastName</h4>
+}
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css" rel="stylesheet" />
+@* <div class="panel  panel-primary" style="width:50vh;"> *@
+<div class="panel panel-success" style="width:50vh;" id="divMain">
+    <div class="panel-heading">
+        Skills
+        <a href="#" onclick="addskill(@Model.Id)" style="float:right !important;margin-right:10px;color:green;">Add</a>
+    </div>
+    <div class="panel-body">
+        @foreach (var skill in Model.Skills)
+        {
+            <span>@skill.Skill.SkillName</span>
+            <a href="#" onclick="removeskill(@skill.Id)" style="color:red;float:right;">Remove</a>
+            <br />
+        }
+    </div>
+</div>
+<script>
+    function addskill(empId) {
+        disablediv();
+        PopupCenterCommon('@Html.Raw(Url.Action("AssignSkill", "MyAccount", new { empId = "EMPID" }))'.replace("EMPID", parseInt(empId)), '', 600, 260);
+
+    }
+    function removeskill(skillId, empId) {
+        alert('SkillId:' + skillId + ', EmpId:' + empId);
+    }
+
+    function PopupCenterCommon(url, title, w, h) {
+        var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+        var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+
+        width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+        height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+        var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+        var top = ((height / 2) - (h / 2)) + dualScreenTop;
+        var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+        if (window.focus) {
+            newWindow.focus();
+        }
+
+    }
+
+    function disablediv() {
+        $("#divMain").find("*").prop('disabled', true);
+    }
+    function enablediv() {
+        $("#divMain").find("*").prop('disabled', false);
+    }
+    function afterSkillAssign(isAssigned) {
+        if (isAssigned) {
+            location.reload();
+        }
+        enablediv();
+    }
+
+    function removeskill(skillId) {
+        $.ajax({
+            url: '../MyAccount/RemoveSkillForEmployee',
+            type: "GET",
+            data: { 'skillId': skillId },
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                if (res != null) {
+                    alert('Removed skill for this employee.');
+                    location.reload();
+                }
+            },
+
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('error');
+            },
+            complete: function () {
+
+            }
+        });
+    }
+
+</script>

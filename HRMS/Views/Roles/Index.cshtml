@@ -1,0 +1,37 @@
+﻿@using HRMS.Views.Admin
+@using Microsoft.AspNetCore.Identity
+@model List<IdentityRole>
+@{
+    Layout = "/Views/Admin/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesAdmin.Roles);
+}
+<h2>Roles list</h2>
+<a asp-action="Create">Create New</a>
+<hr/>
+<table>
+    <thead>
+        <tr>
+            <th style="width:80px;">Sl#</th>
+            <th>Role Name</th>
+            <th style="width:auto;padding-left: 20px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int indexSlNo = 1;
+        }
+        @foreach (IdentityRole role in Model)
+        {
+            <tr>
+                <td>@indexSlNo</td>
+                <td>@role.Name</td>
+                <td style="padding-left: 20px;">
+                    <a asp-action="Edit" asp-route-id="@role.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@role.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@role.Id">Delete</a>
+                </td>
+            </tr>
+            indexSlNo++;
+        }
+    </tbody>
+</table>

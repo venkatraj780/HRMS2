@@ -1,0 +1,44 @@
+﻿@using HRMS.Views.MyAccount
+@model List<Leave>
+@{
+    Layout = "/Views/MyAccount/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesMyAccount.Leaves);
+}
+<a asp-action="ApplyLeave" asp-controller="MyAccount">Apply Leave</a>
+@if (@Model != null)
+{
+    <table style="table">
+        <thead>
+            <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var leave in Model)
+            {
+                <tr>
+                    <td>@leave.StartDate</td>
+                    <td>@leave.EndDate</td>
+                    <td>@leave.Reason</td>
+                    <td>
+                        @{
+                            var msg = "Applied";
+                            @if (@leave.Status == 1)
+                            {
+                                msg = "Approved";
+                            }
+                            else if (@leave.Status == 2)
+                            {
+                                msg = "Rejected";
+                            }
+                        }
+                        @msg
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

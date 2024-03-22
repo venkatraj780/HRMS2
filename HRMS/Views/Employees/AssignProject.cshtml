@@ -1,0 +1,74 @@
+﻿@using HRMS.Controllers
+@model AssignProjectModel
+@{
+    Layout = null;
+}
+<input type="hidden" asp-for="@Model.Id" />
+@if (Model.Projects.Count < 1)
+{
+    <div class="row">
+        <h3>No projects are matching to assign</h3>
+    </div>
+}
+else
+{
+    <div class="row">
+        <select class="form-control" style="width:250px;" id="project">
+            @foreach (var pro in Model.Projects)
+            {
+                <option value="@pro.ProjectId"> @pro.ProjectName</option>
+            }
+        </select>
+        <input type="button" class="btn btn-info btn-large" style="width:120px;" value="Assign Project" onclick="selectProject()" />
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var isAssigned = false;
+        function selectProject() {
+            if ($("#project").selectedIndex < 0) {
+                alert('Please select project.');
+                return false;
+            }
+            var projId = $("#project option:selected").val().trim()
+            $.ajax({
+                url: '../AssignProjectToEmp',
+                type: "GET",
+                data: { 'id': @Model.Id, 'projId': projId },
+                dataType: "JSON",
+                contentType: "application/json; charset=utf-8",
+                success: function (res) {
+                    // alert(res);
+                    if (res != null) {
+                        isAssigned = res;
+                        window.close();
+                    }
+                    else {
+                        isAssigned = false;
+                        window.close();
+                    }
+                },
+
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('error');
+                },
+                complete: function () {
+
+                }
+            });
+
+        }
+        window.onunload = function () {
+            var win = window.opener;
+            if (!win.closed) {
+                if (isAssigned) {
+                    win.afterProjectAssign(true);
+                }
+                else {
+                    win.afterProjectAssign(false);
+                }
+            }
+        };
+    </script>
+
+}

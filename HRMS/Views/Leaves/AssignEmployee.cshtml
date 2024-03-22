@@ -1,0 +1,79 @@
+﻿@using HRMS.Controllers
+@model AssignEmployeeModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <input type="hidden" asp-for="@Model.LeaveId" />
+    <select class="form-control" style="width:250px;" id="employee">
+        @foreach (var emp in Model.Employees)
+        {
+            <option value="@emp.Id">
+                <span>@emp.FirstName @emp.LastName</span><span>(@emp.Department.DepartmentName)</span>
+                <span>
+                    @if (emp.Skills.Count > 0)
+                    {
+                        string result = String.Join(", ", emp.Skills.Select(p => p.Skill.SkillName));
+                        <span>(@result)</span>
+                    }
+                </span>
+                @if (emp.AssignedProjects.Count > 0)
+                {
+                    string assignProCount = emp.AssignedProjects.Count > 1 ? $"({emp.AssignedProjects.Count} Projects)" : $"({emp.AssignedProjects.Count} Project)";
+                    <span>@assignProCount</span>
+                }
+                <span>(Workload : @emp.Workload)</span>
+            </option>
+        }
+    </select>
+    <input type="button" class="btn btn-info btn-large" style="width:120px;" value="Assign Employee" onclick="selectEmployee()" />
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    var isAssigned = false;
+    function selectEmployee() {
+        if ($("#employee").selectedIndex < 0) {
+            alert('Please select employee.');
+            return false;
+        }
+        var empIdReplaced = $("#employee option:selected").val().trim()
+        $.ajax({
+            url: '../Leaves/AssignEmployeeToSickLeave',
+            type: "GET",
+            data: { 'leaveId': @Model.LeaveId, 'empId': @Model.EmpId, 'empIdReplaced': empIdReplaced },
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                // alert(res);
+                if (res != null) {
+                    isAssigned = res;
+                    window.close();
+                }
+                else {
+                    isAssigned = false;
+                    window.close();
+                }
+            },
+
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('error');
+            },
+            complete: function () {
+
+            }
+        });
+
+    }
+    window.onunload = function () {
+        var win = window.opener;
+        if (!win.closed) {
+            if (isAssigned) {
+                win.afterEmployeeAssign(true);
+            }
+            else {
+                win.afterEmployeeAssign(false);
+            }
+        }
+    };
+</script>

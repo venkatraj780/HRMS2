@@ -1,0 +1,183 @@
+﻿@using HRMS.Views.Admin
+@model IEnumerable<HRMS.Models.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "/Views/Admin/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesAdmin.Employees);
+}
+
+<h1>Index</h1>
+<div id="divMain">
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DateOfBirth)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Department)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Skills)
+                </th>
+                @* <th>
+                @Html.DisplayNameFor(model => model.IsProjectManager)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.CreatedTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsActive)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Address)
+                </th>
+                <th>Assigned Projects</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateOfBirth)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+                    </td>
+                    <td>
+                        @* @Html.DisplayFor(modelItem => item.IsDepartmentManager) *@
+                        @{
+                            string skillsList = String.Join(", ", item.Skills.Select(p => p.Skill.SkillName));
+                            <span>@skillsList</span>
+                        }
+                    </td>
+                    @*  <td>
+                @Html.DisplayFor(modelItem => item.IsProjectManager)
+                </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedTime)
+                    </td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span style="color:green;">Active</span>
+                        }
+                        else
+                        {
+                            <span style="color:red;">Deactivated</span>
+
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address.ApartmentNumber), @Html.DisplayFor(modelItem => item.Address.HouseNumber)
+                        <br />
+                        @Html.DisplayFor(modelItem => item.Address.Street)<br />
+                        @Html.DisplayFor(modelItem => item.Address.City) - @Html.DisplayFor(modelItem => item.Address.PostCode)
+                    </td>
+                    <td>
+                        @foreach (var proj in item.AssignedProjects)
+                        {
+                            @Html.DisplayFor(modelItem => proj.ProjectName)
+                            <button type="button" class="btn btn-danger" style="margin-bottom:5px;" onclick="btnUnAssignProject(@item.Id,@proj.ProjectId)">Unassign</button>
+                            <br />
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>|
+                        <button type="button" class="btn btn-info" style="margin-bottom:5px;" onclick="btnAssignProject(@item.Id)">Assign Project</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function btnAssignProject(id) {
+        disablediv();
+        // PopupCenterCommon('@Url.Action("AssignProject", "Employees", new { id = "id" })', '', 600, 260);
+        PopupCenterCommon('@Url.Action("AssignProject", "Employees", new { id = "ID" })'.replace("ID", parseInt(id)), '', 600, 260);
+
+    }
+    function PopupCenterCommon(url, title, w, h) {
+        // Fixes dual-screen position                         Most browsers      Firefox
+        var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+        var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+
+        width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+        height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+        var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+        var top = ((height / 2) - (h / 2)) + dualScreenTop;
+        var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+        if (window.focus) {
+            newWindow.focus();
+        }
+
+    }
+
+    function disablediv() {
+        $("#divMain").find("*").prop('disabled', true);
+    }
+    function enablediv() {
+        $("#divMain").find("*").prop('disabled', false);
+    }
+    function afterProjectAssign(isAssigned) {
+        if (isAssigned) {
+            //refresh page
+            // alert('Assigned');
+            location.reload();
+        }
+        enablediv();
+    }
+
+    function btnUnAssignProject(id, projid) {
+        $.ajax({
+            url: '../Employees/UnAssignProjectToEmp',
+            type: "GET",
+            data: { 'id': id, 'projId': projid },
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                if (res != null) {
+                    alert('Unassigned project for this employee.');
+                    location.reload();
+                }
+            },
+
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('error');
+            },
+            complete: function () {
+
+            }
+        });
+    }
+</script>

@@ -1,0 +1,63 @@
+﻿@using HRMS.Controllers.Emp
+@model AssignSkillModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <select class="form-control" style="width:250px;" id="skill">
+        @foreach (var skill in Model.SkillTypes)
+        {
+            <option value="@skill.Id"> @skill.SkillName</option>
+        }
+    </select>
+    <input type="button" class="btn btn-info btn-large" style="width:120px;" value="Assign Skill" onclick="selectSkill()" />
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    var isAssigned = false;
+    function selectSkill() {
+        if ($("#skill").selectedIndex < 0) {
+            alert('Please select skill.');
+            return false;
+        }
+        var skillId = $("#skill option:selected").val().trim()
+        $.ajax({
+            url: '../MyAccount/AssignSkillToEmployee',
+            type: "GET",
+            data: { 'empId': @Model.EmpId, 'skillId': skillId },
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                // alert(res);
+                if (res != null) {
+                    isAssigned = res;
+                    window.close();
+                }
+                else {
+                    isAssigned = false;
+                    window.close();
+                }
+            },
+
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('error');
+            },
+            complete: function () {
+
+            }
+        });
+
+    }
+    window.onunload = function () {
+        var win = window.opener;
+        if (!win.closed) {
+            if (isAssigned) {
+                win.afterSkillAssign(true);
+            }
+            else {
+                win.afterSkillAssign(false);
+            }
+        }
+    };
+</script>

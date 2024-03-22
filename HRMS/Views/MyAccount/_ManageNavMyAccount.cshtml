@@ -1,0 +1,43 @@
+﻿@using HRMS.Views.Admin
+@using HRMS.Views.MyAccount
+<style>
+    .manageNav li {
+        float: none;
+        width: 100%;
+        /*padding: 5px 8px;
+            margin: 1px 0px;*/
+    }
+
+        .manageNav li a {
+            float: none;
+            width: 100%;
+            padding: 10px 15px;
+            color: #337ab7;
+        }
+
+
+            .manageNav li a:hover {
+                background-color: #337ab7;
+                padding: 10px 15px;
+                border-radius: 4px;
+                color: #fff;
+            }
+
+        .manageNav li.active {
+            background-color: #337ab7 !important;
+            /*padding: 5px 8px;*/
+            border-radius: 4px;
+        }
+
+    .manageNav .active a {
+        float: none;
+        width: 100%;
+        padding: 10px 15px;
+        color: #fff !important;
+    }
+</style>
+<ul class="nav nav-pills nav-stacked manageNav" style="background:#f1f1f1">
+    <li class="@ManageNavPagesMyAccount.MyAccountHomeNavClass(ViewContext)"><a asp-action="Index" asp-controller="MyAccount">Home</a></li>
+    <li class="@ManageNavPagesMyAccount.ProjectsNavClass(ViewContext)"><a asp-action="Projects" asp-controller="MyAccount">Projects</a></li>
+    <li class="@ManageNavPagesMyAccount.LeavesNavClass(ViewContext)"><a asp-action="Leaves" asp-controller="MyAccount">Leaves</a></li>
+</ul>

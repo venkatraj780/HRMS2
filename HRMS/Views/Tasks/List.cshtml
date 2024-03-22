@@ -1,0 +1,161 @@
+﻿@using HRMS.Views.Admin
+@model IEnumerable<HRMS.Models.TaskSingle>
+
+@{
+    ViewData["Title"] = "Tasks";
+    Layout = "/Views/Admin/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesAdmin.Projects);
+}
+<link rel=" stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    a[target="_blank"]::after {
+        content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+        margin: 0 3px 0 5px;
+    }
+</style>
+<h4>@ViewBag.ProjectName - Tasks</h4>
+
+<table class="table" id="tbl">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Deadline)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AssignedTo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CompletedDate)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="details-control">
+                    <span class="faright"><i class="fa-solid fa-angle-right"></i></span>
+                    <span class="fadown" style="display:none;"><i class="fa-solid fa-angle-down"></i></span>
+                    <div class="child" style="display:none;">
+                        <div class="row">
+                            @foreach (var comm in item.Comments)
+                            {
+                                <div style="padding-left:10px;padding-right:10px;margin-bottom:5px;">
+                                    <div style="border:1px solid lightgray;padding-left:10px;padding-right:10px;">
+                                        <pre>@comm.Description</pre><br />
+                                    </div>
+                                    <span>Commented By: <i>@comm.User.FirstName @comm.User.LastName</i></span><br />
+                                    <div style="float:right;">
+                                        <span><i>@comm.CreatedAt</i></span>
+                                    </div>
+
+                                    @foreach (var att in comm.Attachements)
+                                    {
+                                        <a target="_blank" href="@att.FileLocation">@att.FileName</a>
+                                        <br />
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div style="float:right;">
+                            <button type="button" class="btn btn-info" style="margin-bottom:5px;" onclick="addcomment(@item.TaskId)">Add Comment</button>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Deadline)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssignedTo.FirstName) @Html.DisplayFor(modelItem => item.AssignedTo.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedBy.FirstName) @Html.DisplayFor(modelItem => item.CreatedBy.LastName)
+                </td>
+                <td>
+                    @* <select id="selToDo" onchange="onchangetodo('@item.TaskId')">
+                <option value="1" selected=@(@item.Status==1)>To Do</option>
+                <option value="2" selected=@(@item.Status==2)>In Progress</option>
+                <option value="3" selected=@(@item.Status==3)>Completed</option>
+                </select> *@
+                    @if (@item.Status == 1)
+                    {
+                        <span>To Do</span>
+                    }
+                    else if (@item.Status == 2)
+                    {
+                        <span>In Progress</span>
+                    }
+                    else if (@item.Status == 3)
+                    {
+                        <span>Completed</span>
+                    }
+                </td>
+                <td>
+                    @if (@item.Status == 3)
+                    {
+                        @Html.DisplayFor(modelItem => item.CompletedDate)
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+<script>
+    var table = $('#tbl').DataTable({
+        searching: false, ordering: false, paging: false, info: false, columnDefs: [{
+            "defaultContent": "",
+            "targets": "_all"
+        }]
+    });
+    $('#tbl tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var tdfaright = tr.find("span.faright");
+        var tdfadown = tr.find("span.fadown");
+        $divchild = tr.has("div.child");
+        var row = table.row(tr);
+        var divtext = $(this).find('.child').html();
+        if (row.child.isShown()) {
+            row.child.hide();
+            tr.removeClass('shown');
+            tdfaright.show();
+            tdfadown.hide();
+        }
+        else {
+            // row.child(format(row.data())).show();
+            row.child(divtext).show();
+            tr.addClass('shown');
+            tdfaright.hide();
+            tdfadown.show();
+        }
+    });
+
+</script>

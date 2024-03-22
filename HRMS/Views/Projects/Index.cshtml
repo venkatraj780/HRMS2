@@ -1,0 +1,83 @@
+﻿@using HRMS.Views.Admin
+@model IEnumerable<HRMS.Models.Project>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "/Views/Admin/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesAdmin.Projects);
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SkillsRequired)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProjectName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDate)
+            </td>
+                <td>
+                    @{
+                        string skillsList = String.Join(", ", item.SkillsRequired.Select(p => p.Skill.SkillName));
+                        <span>@skillsList</span>
+                    }
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedTime)
+            </td>
+            <td>
+                    @if (item.IsActive)
+                    {
+                        <span style="color:green;">Active</span>
+                    }
+                    else
+                    {
+                        <span style="color:red;">Deactivated</span>
+
+                    }
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProjectId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ProjectId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProjectId">Delete</a>
+            </td>
+            <td>
+                    <a asp-controller="Tasks" asp-action="Create" asp-route-ProjId="@item.ProjectId">Create Task</a>
+                    <a asp-controller="Tasks" asp-action="List" asp-route-ProjId="@item.ProjectId">View All Tasks</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
