@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace HRMS.Controllers.Emp
 {
-    [Authorize(Roles = "Software Engineer")]
+    [Authorize]
     public class MyAccountController : Controller
     {
 
