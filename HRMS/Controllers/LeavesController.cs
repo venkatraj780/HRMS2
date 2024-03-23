@@ -218,7 +218,6 @@ namespace HRMS.Controllers
 
         public async Task<IActionResult> AssignEmployee(int leaveId, int empId)
         {
-            empId = 1;
             var empCurr = _context.Employees.Where(x => x.Id == empId).Include(x => x.Skills).ThenInclude(x => x.Skill).FirstOrDefault();
             var empSkills = empCurr.Skills.Select(x => x.Skill).ToList();
             List<Employee>? employees = _context.Employees.Where(x => x.Id != empId && (x.DepartmentId == empCurr.DepartmentId || x.Skills.Any(y => empSkills.Contains(y.Skill))))
