@@ -17,7 +17,7 @@ namespace HRMS.Views.Admin
         public static string Leaves => "Leaves";
         public static string Roles => "Roles";
         public static string SkillTypes => "SkillTypes";
-        //public static string Classes => "Classes";
+        public static string Holidays => "Holidays";
         //public static string Seasons => "Seasons";
         //public static string CostCodes => "CostCodes";
         //public static string Sizes => "Sizes";
@@ -35,7 +35,7 @@ namespace HRMS.Views.Admin
         public static string LeavesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Leaves);
         public static string RolesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Roles);
         public static string SkillTypeNavClass(ViewContext viewContext) => PageNavClass(viewContext, SkillTypes);
-        //public static string ClassesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Classes);
+        public static string HolidaysNavClass(ViewContext viewContext) => PageNavClass(viewContext, Holidays);
         //public static string SeasonsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Seasons);
         //public static string CostCodesNavClass(ViewContext viewContext) => PageNavClass(viewContext, CostCodes);
         //public static string SizesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Sizes);

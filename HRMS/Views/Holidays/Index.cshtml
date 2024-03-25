@@ -1,0 +1,46 @@
+﻿@using HRMS.Views.Admin
+@model IEnumerable<HRMS.Models.Holiday>
+
+@{
+    ViewData["Title"] = "Holidays";
+    Layout = "/Views/Admin/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesAdmin.Holidays);
+}
+
+<h1>Index</h1>
+<div id="divMain">
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.HolidayName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HolidayName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.HolidayId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.HolidayId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.HolidayId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

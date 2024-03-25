@@ -178,7 +178,11 @@ namespace HRMS.Controllers.Emp
             return false;
         }
 
-
+        public async Task<IActionResult> Holidays()
+        {
+            List<Models.Holiday> holidayes =await _db.Holidays.Where(x => x.Date.Year == DateTime.Now.Year).ToListAsync();
+            return View(holidayes);
+        }
     }
     public class AssignSkillModel
     {

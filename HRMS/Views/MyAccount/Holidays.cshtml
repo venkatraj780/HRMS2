@@ -1,0 +1,38 @@
+﻿@using HRMS.Views.MyAccount
+@model IEnumerable<HRMS.Models.Holiday>
+
+@{
+    ViewData["Title"] = "Holidays";
+    Layout = "/Views/MyAccount/_Layout.cshtml";
+    ViewData.AddActivePage(ManageNavPagesMyAccount.Holidays);
+}
+
+<h1>Holidays List</h1>
+<div id="divMain">
+   
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.HolidayName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HolidayName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

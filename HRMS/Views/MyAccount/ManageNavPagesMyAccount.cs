@@ -16,7 +16,7 @@ namespace HRMS.Views.MyAccount
 
         public static string Projects => "IndexProjects";
         public static string Leaves => "Leaves";
-        //public static string Roles => "Roles";
+        public static string Holidays => "Holidays";
 
         public static string MyAccountHomeNavClass(ViewContext viewContext) => PageNavClass(viewContext, MyAccountHome);
 
@@ -26,7 +26,7 @@ namespace HRMS.Views.MyAccount
 
         public static string ProjectsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Projects);
         public static string LeavesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Leaves);
-        //public static string RolesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Roles);
+        public static string HolidaysNavClass(ViewContext viewContext) => PageNavClass(viewContext, Holidays);
 
         public static string PageNavClass(ViewContext viewContext, string page)
         {
