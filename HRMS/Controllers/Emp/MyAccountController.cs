@@ -53,6 +53,7 @@ namespace HRMS.Controllers.Emp
 
         public IActionResult ApplyLeave()
         {
+            ViewBag.DisabledDate = string.Join(",", _db.Holidays.Select(c => c.Date.ToString("yyyy-MM-dd")).ToArray());
             return View();
         }
         [HttpPost]
@@ -61,10 +62,15 @@ namespace HRMS.Controllers.Emp
         {
             if (ModelState.IsValid)
             {
+                if (leave.StartDate > leave.EndDate)
+                {
+                    ModelState.AddModelError(string.Empty, "Start date should be less than or equal to End date");
+                    return View();
+                }
                 leave.Status = 0;
                 //var userId = HttpContext.Session.GetInt32("UserIdDB");
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var user = _db.Employees.Where(x => x.EmployeeUserID == userId).FirstOrDefault();
+                var user = await _db.Employees.Where(x => x.EmployeeUserID == userId).FirstOrDefaultAsync();
                 //if (userId != null && userId > 0)
                 if (user != null)
                 {
@@ -82,10 +88,10 @@ namespace HRMS.Controllers.Emp
         public async Task<IActionResult> Projects()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _db.Employees.Where(x => x.EmployeeUserID == userId).FirstOrDefault();
+            var user = await _db.Employees.Where(x => x.EmployeeUserID == userId).FirstOrDefaultAsync();
             if (user != null)
             {
-                var projects = _db.Projects.Where(x => x.AssignedEmployees.Any(y => y.Id == user.Id)).ToList();
+                var projects = await _db.Projects.Where(x => x.AssignedEmployees.Any(y => y.Id == user.Id)).ToListAsync();
                 return View(projects);
             }
             return View();
@@ -93,7 +99,7 @@ namespace HRMS.Controllers.Emp
 
         public async Task<IActionResult> AssignSkill(int empId)
         {
-            var empSkills = _db.EmpSkills.Where(x => x.EmpId == empId).Include(x => x.Skill).ToList();
+            var empSkills = await _db.EmpSkills.Where(x => x.EmpId == empId).Include(x => x.Skill).ToListAsync();
             var totalSkills = _db.Skills.AsEnumerable().Where(x => !empSkills.Any(y => y.Skill.Id == x.Id)).ToList();
             AssignSkillModel model = new()
             {
@@ -106,7 +112,7 @@ namespace HRMS.Controllers.Emp
         {
             try
             {
-                var exist = _db.EmpSkills.Where(x => x.EmpId == empId && x.SkillId == skillId).FirstOrDefault();
+                var exist = await _db.EmpSkills.Where(x => x.EmpId == empId && x.SkillId == skillId).FirstOrDefaultAsync();
                 if (exist == null)
                 {
                     EmpSkill obj = new()
@@ -130,7 +136,7 @@ namespace HRMS.Controllers.Emp
 
         public async Task<bool> RemoveSkillForEmployee(int skillId)
         {
-            var skill = _db.EmpSkills.Where(x => x.Id == skillId).FirstOrDefault();
+            var skill = await _db.EmpSkills.Where(x => x.Id == skillId).FirstOrDefaultAsync();
             if (skill != null)
             {
                 _db.EmpSkills.Remove(skill);
@@ -144,13 +150,13 @@ namespace HRMS.Controllers.Emp
         public async Task<IActionResult> Tasks(int projId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _db.Employees.Where(x => x.EmployeeUserID == userId).Include(x => x.Skills).ThenInclude(x => x.Skill).FirstOrDefault();
+            var user = await _db.Employees.Where(x => x.EmployeeUserID == userId).Include(x => x.Skills).ThenInclude(x => x.Skill).FirstOrDefaultAsync();
             if (user != null)
             {
-                var tasks = _db.Tasks.Where(x => x.ProjectId == projId && x.AssignedToUserId == user.Id).IgnoreAutoIncludes()
-                    .Include(x=>x.Comments).ThenInclude(x=>x.Attachements)
-                    .Include(x=>x.Comments).ThenInclude(x=>x.User)
-                    .Include(x => x.CreatedBy).Include(x => x.Project).ToList();
+                var tasks = await _db.Tasks.Where(x => x.ProjectId == projId && x.AssignedToUserId == user.Id).IgnoreAutoIncludes()
+                    .Include(x => x.Comments).ThenInclude(x => x.Attachements)
+                    .Include(x => x.Comments).ThenInclude(x => x.User)
+                    .Include(x => x.CreatedBy).Include(x => x.Project).ToListAsync();
                 return View(tasks);
             }
             return View();
@@ -166,7 +172,7 @@ namespace HRMS.Controllers.Emp
         [HttpGet]
         public async Task<bool> ChangeTaskStatus(int taskId, int status)
         {
-            var task = _db.Tasks.Where(x => x.TaskId == taskId).FirstOrDefault();
+            var task = await _db.Tasks.Where(x => x.TaskId == taskId).FirstOrDefaultAsync();
             if (task != null)
             {
                 task.Status = status;
@@ -180,7 +186,7 @@ namespace HRMS.Controllers.Emp
 
         public async Task<IActionResult> Holidays()
         {
-            List<Models.Holiday> holidayes =await _db.Holidays.Where(x => x.Date.Year == DateTime.Now.Year).ToListAsync();
+            List<Models.Holiday> holidayes = await _db.Holidays.Where(x => x.Date.Year == DateTime.Now.Year).ToListAsync();
             return View(holidayes);
         }
     }
