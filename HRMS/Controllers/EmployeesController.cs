@@ -61,6 +61,7 @@ namespace HRMS.Controllers
             }
             var user = await _userManager.FindByIdAsync(employee.EmployeeUserID);
             ViewData["Email"] = user?.Email;
+            ViewData["Role"] = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
             return View(employee);
         }
 
@@ -169,7 +170,9 @@ namespace HRMS.Controllers
                 PostCode = employee.Address.PostCode,
                 Street = employee.Address.Street
             };
+            var existRole= await _userManager.GetRolesAsync(user);
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName", employee.DepartmentId);
+            ViewData["Roles"] = new SelectList(_roleManager.Roles.Where(x => x.Name != "Superadmin").ToList(), "Name", "Name", existRole.FirstOrDefault());
             return View(model);
         }
 
@@ -178,7 +181,7 @@ namespace HRMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,DateOfBirth,DepartmentId,Email,IsActive,PhoneNumber,HouseNumber,ApartmentNumber,City,PostCode,Street")] EmpEditDTO employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,DateOfBirth,DepartmentId,Email,IsActive,PhoneNumber,HouseNumber,ApartmentNumber,City,PostCode,Street,Role")] EmpEditDTO employee)
         {
             if (id != employee.Id)
             {
@@ -209,7 +212,20 @@ namespace HRMS.Controllers
                             user.Email = employee.Email;
                             user.UserName = employee.Email;
                             var result = await _userManager.UpdateAsync(user);
+                            if (!string.IsNullOrEmpty(employee.Role))
+                            {
+                                var existRole = await _userManager.GetRolesAsync(user);
+                                if (existRole != null && existRole.Count > 0)
+                                {
+                                    if (employee.Role.ToLower() != existRole.FirstOrDefault().ToLower())
+                                    {
+                                        await _userManager.RemoveFromRolesAsync(user,existRole);
+                                        await _userManager.AddToRoleAsync(user, employee.Role);
+                                    }
+                                }
+                            }
                         }
+
                         _context.Employees.Update(existEmp);
                         await _context.SaveChangesAsync();
                     }
@@ -244,7 +260,7 @@ namespace HRMS.Controllers
             }
 
             var employee = await _context.Employees
-                .Include(e => e.Department).Include(x=>x.Address).Include(x=>x.Skills).ThenInclude(x=>x.Skill)
+                .Include(e => e.Department).Include(x => x.Address).Include(x => x.Skills).ThenInclude(x => x.Skill)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {

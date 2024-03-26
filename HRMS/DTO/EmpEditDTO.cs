@@ -20,5 +20,6 @@ namespace HRMS.DTO
         public string PostCode { get; set; }
         public string Street { get; set; }
         public bool IsActive { get; set; }
+        public string Role { get; set; }
     }
 }
